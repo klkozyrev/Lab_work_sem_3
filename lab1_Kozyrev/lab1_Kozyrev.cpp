@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <Windows.h>;
 
 using namespace std;
 
@@ -251,7 +252,37 @@ void save(Pipe &p, Station &s) {
 }
 
 void download(Pipe& p, Station& s) {
-    
+    char buff[50];
+    ifstream input("input.txt"); 
+    if (!input.is_open()) // если файл не открыт
+        cout << "Файл не может быть открыт!\n"; // сообщить об этом
+    else {
+
+        input >> buff;
+        if (buff[0] == 'P') {
+            input >> p.length;
+            input >> p.diameter;
+            input >> p.status;
+            input >> buff;
+            if (buff[0] == 'S') {
+                input >> s.name;
+                input >> s.total;
+                input >> s.work;
+                input >> s.efficiency;
+                input >> s.status;
+            }
+        }
+        else if ( buff[0] == 'S') {
+            input >> s.name;
+            input >> s.total;
+            input >> s.work;
+            input >> s.efficiency;
+            input >> s.status;
+        }
+        else {
+            cout << "Данные не введены в файл";
+        }
+    }
 }
 
 
