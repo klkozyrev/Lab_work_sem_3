@@ -2,10 +2,8 @@
 //
 
 #include <iostream>
-#include <conio.h>
 #include <string>
-#include <windows.h>
-#include <stdio.h>
+#include <fstream>
 
 using namespace std;
 
@@ -29,7 +27,7 @@ void point_menu() {
     cout << "Главное меню" << endl;
     cout << "1. Добавить трубу\n"
         << "2. Добавить КС\n"
-        << "3. Просмотр всех объектов\n"
+        << "3. Просмотр всех заданных объектов\n"
         << "4. Редактировать трубу\n"
         << "5. Редактировать КС\n"
         << "6. Сохранить изменения\n"
@@ -50,7 +48,7 @@ int check_correct_menu() {
     int check_correct_int(Station &s, bool indicator){
     double x;
     if (indicator) {
-        while ((cin >> x).fail() || trunc(x) != x) {
+        while ((cin >> x).fail() || trunc(x) != x || x <= 0) {
             cin.clear();
             cin.ignore(INT_MAX, '\n');
             cout << "Данные неверные, попробуйте ещё раз: ";
@@ -66,7 +64,7 @@ int check_correct_menu() {
 
 int check_correct_double() {
     double x;
-    while ((cin >> x).fail() || x < 0) {
+    while ((cin >> x).fail() || x <= 0) {
         cin.clear();
         cin.ignore(INT_MAX, '\n');
         cout << "Данные неверные, попробуйте ещё раз: ";
@@ -76,12 +74,10 @@ int check_correct_double() {
 
 int check_correct_status() {
     double x;
-    cin >> x;
-    while (x<-1 && x>2 || trunc(x)!=x) {
+    while ((cin >> x).fail() || x>1 || x<0 || trunc(x)!=x) {
         cin.clear();
         cin.ignore(INT_MAX, '\n');
         cout << "Данные неверные, попробуйте ещё раз: ";
-        cin >> x;
     }
     if (x == 1) {
         return true;
@@ -92,64 +88,80 @@ int check_correct_status() {
 }
 
 void add_pipe(Pipe &p) {
-    cout << "Введите длину трубы: ";
-    p.length = check_correct_double();
-    cout << "Введите диаметр трубы:";
-    p.diameter = check_correct_double();
-    cout << "Состояние трубы:\n";
-    cout << "Если труба в работе, то введите 1, иначе введите 0: ";
-    p.status = check_correct_status(); 
+    if (p.length == 0) {
+        cout << "Введите длину трубы: ";
+        p.length = check_correct_double();
+        cout << "Введите диаметр трубы:";
+        p.diameter = check_correct_double();
+        cout << "Состояние трубы:\n";
+        cout << "Если труба в работе, то введите 1, иначе введите 0: ";
+        p.status = check_correct_status();
+    }
+    else {
+        cout << "Труба уже создана\n";
+    }
 }
 
 void add_station(Station &s) {
-    s.total = 0;
-    cout << "Введите кодовое имя станции: ";
-    cin >> s.name;
-    cout << "Введите общее кол-во цехов: ";
-    s.total = check_correct_int(s, true);
-    cout << "Введите кол-во рабочих цехов: ";
-    s.work = check_correct_int(s, false);
-    cout << "Введите эффективность: ";
-    s.efficiency = check_correct_double();
-    cout << "Состояние компресорной станции:\n";
-    cout << "Если вы хотите запустить станцию, то введите 1, если остановить введите 0: ";
-    s.status = check_correct_status();
+    if (s.name == "") {
+        s.total = 0;
+        cout << "Введите кодовое имя станции: ";
+        cin >> s.name;
+        cout << "Введите общее кол-во цехов: ";
+        s.total = check_correct_int(s, true);
+        cout << "Введите кол-во рабочих цехов: ";
+        s.work = check_correct_int(s, false);
+        cout << "Введите эффективность: ";
+        s.efficiency = check_correct_double();
+        cout << "Состояние компресорной станции:\n";
+        cout << "Если вы хотите запустить станцию, то введите 1, если остановить введите 0: ";
+        s.status = check_correct_status();
+    }
+    else {
+        cout << "Станция уже создана\n";
+    }
+
 }
 
 void show_all(Pipe &p, Station &s) {
-    if (p.length != 0 && s.name != "") {
-        cout << "Информация о трубе: \n"
-            << "Длина трубы:\n"
+    if (p.length != 0) {
+        cout << "Информация о трубе\n"
+            << "Длина трубы: "
             << p.length << "\n"
-            << "Диаметр трубы:\n"
+            << "Диаметр трубы: "
             << p.diameter << "\n"
-            << "Состояние трубы: \n";
+            << "Состояние трубы: ";
         if (p.status) {
             cout << "Труба в работе\n";
         }
         else {
             cout << "Труба в ремонте\n";
         }
+    }
+    else {
+        cout << "Данные по трубе не введены\n";
+    }
+
+    if (s.name != "") {
         cout << "\n" << "Информация о комперсорной станции\n"
-            << "Название станции : \n"
+            << "Название станции: "
             << s.name << "\n"
-            << "Всего цехов: \n"
+            << "Всего цехов: "
             << s.total << "\n"
-            << "Рабочих цехов\n"
+            << "Рабочих цехов "
             << s.work << "\n"
-            << "Эффективность\n"
+            << "Эффективность "
             << s.efficiency << "\n"
-            << "Статус работы станции\n";
+            << "Статус работы станции ";
         if (s.status) {
             cout << "Станция запущена\n";
         }
         else {
             cout << "Станция остановлена\n";
         };
-
     }
     else {
-        cout << "Данные не введены, либо введены не окончательно\n";
+            cout << "Данные по станции не введены\n";
     }
 }
 
@@ -194,13 +206,54 @@ void edit_station(Station &s) {
     }
 }
 
-void save() {
+void save(Pipe &p, Station &s) {
+    ofstream output("output.txt");
+    if (p.length != 0) {
+        output << "Информация о трубе \n"
+            << "Длина трубы: "
+            << p.length << "\n"
+            << "Диаметр трубы: "
+            << p.diameter << "\n"
+            << "Состояние трубы: ";
+        if (p.status) {
+            output << "Труба в работе\n";
+        }
+        else {
+            output << "Труба в ремонте\n";
+        }
+    }
+    else {
+        output << "Данные по трубе не введены\n";
+    }
 
+    if (s.name != "") {
+        output << "\n" << "Информация о комперсорной станции\n"
+            << "Название станции :"
+            << s.name << "\n"
+            << "Всего цехов: "
+            << s.total << "\n"
+            << "Рабочих цехов "
+            << s.work << "\n"
+            << "Эффективность "
+            << s.efficiency << "\n"
+            << "Статус работы станции ";
+        if (s.status) {
+            output << "Станция запущена\n";
+        }
+        else {
+            output << "Станция остановлена\n";
+        };
+    }
+    else {
+        output << "Данные по станции не введены\n";
+    }
+    output.close();
 }
 
-void download() {
-
+void download(Pipe& p, Station& s) {
+    
 }
+
 
 
 int main()
@@ -230,13 +283,19 @@ int main()
             edit_station(s);
             break;
         case 6:
-            save();
+            save(p, s);
             break;
         case 7:
-            download();
+            download(p, s);
+
             break;
         case 0:
-            return 0;
+            if (p.status && s.status) {
+                return 0;
+            }
+            else {
+                cout << "Проверьте включили ли вы станцию и вывели ли вы трубу из ремонта!\n";
+            }
             break;
 
         }
