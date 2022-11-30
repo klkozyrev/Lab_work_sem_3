@@ -1,9 +1,10 @@
 #include "Station.h"
 #include "utils.h"
 #include <fstream>
+#include <iostream>
+#include <float.h>
 #include <unordered_map>
 #include <unordered_set>
-#include <iostream>
 #include <string>
 
 using namespace std;
@@ -59,4 +60,12 @@ void Station::LoadStation(std::ifstream& file)
     file >> total;
     file >> work;
     file >> efficiency;
+}
+
+void Station::EditStation()
+{
+    cout << " Число цехов: " << total << endl;
+    cout << "Число рабочих цехов " << work << endl;
+    cout << "Введите новое число рабочих цехов " << endl;
+    work = Check_Correct(0, total);
 }

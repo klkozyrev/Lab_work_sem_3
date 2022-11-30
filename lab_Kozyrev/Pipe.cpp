@@ -2,6 +2,9 @@
 #include "utils.h"
 #include <iostream>
 #include <fstream>
+#include <string>
+#include <vector>
+#include <float.h>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -65,3 +68,17 @@ void Pipe::LoadPipe(std::ifstream& file)
     file >> diametr;
     file >> status;
 }
+
+void Pipe::Edit_Pipe()
+{
+    cout << "Состояние трубы: ";
+    if (status) {
+        cout << "Труба в работе\n";
+    }
+    else {
+        cout << "Труба в ремонте\n";
+    }
+    cout << "Если труба в работе, то введите 1, иначе введите 0: ";
+    status = Check_Correct(0, 1);
+}
+
