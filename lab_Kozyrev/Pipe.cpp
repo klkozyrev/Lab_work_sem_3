@@ -6,33 +6,38 @@ using namespace std;
 int Pipe::MaxID = 0;
 
 ostream& operator << (ostream& out, const Pipe& p)
-{
-    if (p.length != 0) {
-        out << "Информация о трубе\n"
-            << "Длина трубы: "
-            << p.length << "\n"
-            << "Диаметр трубы: "
-            << p.diameter << "\n"
-            << "Состояние трубы: ";
-        if (p.status) {
-            out << "Труба в работе\n";
+{   
+    for (int i = 0; i < Pipe::MaxID; i++) {
+        if (p.lenght != 0) {
+            out << "Информация о трубе\n"
+                << "ID: "
+                << p.id << "\n"
+                << "Длина трубы: "
+                << p.lenght << "\n"
+                << "Диаметр трубы: "
+                << p.diametr << "\n"
+                << "Состояние трубы: ";
+            if (p.status) {
+                out << "Труба в работе\n";
+            }
+            else {
+                out << "Труба в ремонте\n";
+            }
         }
         else {
-            out << "Труба в ремонте\n";
+            out << "Данные по трубе не введены\n";
         }
-    }
-    else {
-        out << "Данные по трубе не введены\n";
     }
     return out;
 }
 
 istream& operator >> (istream& in, Pipe& p)
 {
+    p.id = Pipe::MaxID++;
     cout << "Введите длину трубы: ";
-    p.length= Check_Correct(0, INT_MAX);
+    p.lenght= Check_Correct(0, INT_MAX);
     cout << "Введите диаметр трубы:";
-    p.diameter = Check_Correct(0, INT_MAX);
+    p.diametr = Check_Correct(0, INT_MAX);
     cout << "Состояние трубы:\n";
     cout << "Если труба в работе, то введите 1, иначе введите 0: ";
     p.status = Check_Correct(0, 1);

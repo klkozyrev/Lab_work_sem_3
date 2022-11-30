@@ -8,10 +8,15 @@
 #include "Pipe.h";
 #include "Station.h";
 #include "utils.h";
-
+#include <unordered_map>;
+#include <unordered_set>;
 
 using namespace std;
 
+unordered_map<int, Pipe> Pipemap;
+unordered_map<int, Station> Stationmap;
+unordered_set<int> PipeIDs;
+unordered_set<int> StationIDs;
 
 void point_menu() {
     system("cls");
@@ -23,23 +28,16 @@ void point_menu() {
         << "5. Редактировать КС\n"
         << "6. Сохранить изменения\n"
         << "7. Загрузить данные\n"
+        << "8. Поиск трубы\n"
+        << "9. Поиск КС\n"
         << "0. Выход\n"
         << "Выберите пункт меню: ";
         
 }
 
-
-void edit_pipe(Pipe &p) {
-    if (p.length != 0) {
-        if (p.status) {
-            p.status = false;
-        }
-        else {
-            p.status = true;
-        }
-    }
-    else {
-        cout << "Данные не введены, либо введены не окончательно\n";
+void edit_pipe(unordered_map <int, Pipe>& Pipemap) {
+    if (Pipemap.size() != 0) {
+        cout << "Выберите 1 трубу - 1 \n Выберите "
     }
 }
 
@@ -57,107 +55,113 @@ void edit_station(Station &s) {
     }
 }
 
-void save(Pipe &p, Station &s) {
-    ofstream output("intelligence.txt");
-    if (p.length != 0) {
-        output << "Pipe \n"
-            << p.length << "\n"
-            << p.diameter << "\n";
-        if (p.status) {
-            output << "1\n";
-        }
-        else {
-            output << "0";
-        }
-    }
+//void save(Pipe &p, Station &s) {
+//    ofstream output("intelligence.txt");
+//    if (p.length != 0) {
+//        output << "Pipe \n"
+//            << p.length << "\n"
+//            << p.diameter << "\n";
+//        if (p.status) {
+//            output << "1\n";
+//        }
+//        else {
+//            output << "0";
+//        }
+//    }
+//
+//    if (s.name != "") {
+//        output << "\n" << "Station\n"
+//            << s.name << "\n"
+//            << s.total << "\n"
+//            << s.work << "\n"
+//            << s.efficiency << "\n";
+//        if (s.status) {
+//            output << "1\n";
+//        }
+//        else {
+//            output << "0\n";
+//        };
+//    }
+//    output.close();
+//}
 
-    if (s.name != "") {
-        output << "\n" << "Station\n"
-            << s.name << "\n"
-            << s.total << "\n"
-            << s.work << "\n"
-            << s.efficiency << "\n";
-        if (s.status) {
-            output << "1\n";
-        }
-        else {
-            output << "0\n";
-        };
+//void download(Pipe& p, Station& s) {
+//    char buff[50];
+//
+//    ifstream input("intelligence.txt"); 
+//    if (!input.is_open()) // если файл не открыт
+//        cout << "Файл не может быть открыт!\n"; // сообщить об этом
+//    else {
+//
+//        input >> buff;
+//        if (buff[0] == 'P') {
+//            input >> p.length;
+//            input >> p.diameter;
+//            input >> p.status;
+//            input >> buff;
+//            if (buff[0] == 'S') {
+//                input >> s.name;
+//                input >> s.total;
+//                input >> s.work;
+//                input >> s.efficiency;
+//                input >> s.status;
+//            }
+//        }
+//        else if ( buff[0] == 'S') {
+//            input >> s.name;
+//            input >> s.total;
+//            input >> s.work;
+//            input >> s.efficiency;
+//            input >> s.status;
+//        }
+//        else {
+//            cout << "Данные не введены в файл\n";
+//        }
+//    }
+//}
+
+void show_all(unordered_map<int, Pipe>& Pipemap, unordered_map<int, Station>& Stationmap) {
+    for (auto& Pipe : Pipemap) {
+        cout << Pipe.second << endl;
     }
-    output.close();
+    for (auto& Station : Stationmap) {
+        cout << Station.second << endl;
+    }
 }
-
-void download(Pipe& p, Station& s) {
-    char buff[50];
-
-    ifstream input("intelligence.txt"); 
-    if (!input.is_open()) // если файл не открыт
-        cout << "Файл не может быть открыт!\n"; // сообщить об этом
-    else {
-
-        input >> buff;
-        if (buff[0] == 'P') {
-            input >> p.length;
-            input >> p.diameter;
-            input >> p.status;
-            input >> buff;
-            if (buff[0] == 'S') {
-                input >> s.name;
-                input >> s.total;
-                input >> s.work;
-                input >> s.efficiency;
-                input >> s.status;
-            }
-        }
-        else if ( buff[0] == 'S') {
-            input >> s.name;
-            input >> s.total;
-            input >> s.work;
-            input >> s.efficiency;
-            input >> s.status;
-        }
-        else {
-            cout << "Данные не введены в файл\n";
-        }
-    }
-}
-
 
 
 int main()
-{   Station s;
+{   
+    Station s;
     Pipe p;
-    p.length = 0;
-    s.name = "";
-    p.status = true;
-    s.status = true;
     
     setlocale(LC_ALL, "Russian");
 
     while (1) {
         point_menu();
-        switch (Check_Correct(0, 7)) {
-        case 1:
-            cin >> p;
-            break;
-        case 2:
+        switch (Check_Correct(0, 9)) {
+        case 1: 
+              cin >> p;
+              Pipemap.insert({ p.GetPipeID(),p });
+              break;
+        case 2: 
             cin >> s;
+            Stationmap.insert({ s.GetStationID(), s });
             break;
-        case 3:
-            cout << p;
-            cout << s;
+        case 3: 
+            show_all(Pipemap, Stationmap);
             break;
         case 4:
-            edit_pipe(p);
+            edit_pipe(Pipemap);
             break;
         case 5:
-            edit_station(s);
+            //edit_station(s);
             break;
         case 6:
-            save(p, s);
+            //save(p, s);
             break;
         case 7:
-            download(p, s);
+            //download(p, s);
 
             break;
         case 0:
@@ -165,7 +169,7 @@ int main()
             cout << "Хотите ли сохранить изменения? Если хотитие введите 1 иначе 0 \n";
             cin >> k;
             if (k == 1) {
-                save(p, s);
+                //save(p, s);
             }
             return 0;
             break;
