@@ -35,90 +35,10 @@ void point_menu() {
         
 }
 
-void edit_pipe(unordered_map <int, Pipe>& Pipemap) {
-    if (Pipemap.size() != 0) {
-        cout << "Выберите 1 трубу - 1 \n Выберите "
-    }
-}
 
-void edit_station(Station &s) {
-    if (s.name != "") {
-        cout << "Измените кол-во рабочих цехов:\n";
-        cout << "Всего цехов: " << s.total << "\n";
-        cout << "Новое значение\n";
-        s.work = Check_Correct(0, s.total);
-        cout << "Если компресорная станция в работе, то введите 1, иначе введите 0: \n";
-        s.status = Check_Correct(0, 1);
-    }
-    else {
-        cout << "Данные не введены, либо введены не окончательно\n";
-    }
-}
 
-//void save(Pipe &p, Station &s) {
-//    ofstream output("intelligence.txt");
-//    if (p.length != 0) {
-//        output << "Pipe \n"
-//            << p.length << "\n"
-//            << p.diameter << "\n";
-//        if (p.status) {
-//            output << "1\n";
-//        }
-//        else {
-//            output << "0";
-//        }
-//    }
-//
-//    if (s.name != "") {
-//        output << "\n" << "Station\n"
-//            << s.name << "\n"
-//            << s.total << "\n"
-//            << s.work << "\n"
-//            << s.efficiency << "\n";
-//        if (s.status) {
-//            output << "1\n";
-//        }
-//        else {
-//            output << "0\n";
-//        };
-//    }
-//    output.close();
-//}
 
-//void download(Pipe& p, Station& s) {
-//    char buff[50];
-//
-//    ifstream input("intelligence.txt"); 
-//    if (!input.is_open()) // если файл не открыт
-//        cout << "Файл не может быть открыт!\n"; // сообщить об этом
-//    else {
-//
-//        input >> buff;
-//        if (buff[0] == 'P') {
-//            input >> p.length;
-//            input >> p.diameter;
-//            input >> p.status;
-//            input >> buff;
-//            if (buff[0] == 'S') {
-//                input >> s.name;
-//                input >> s.total;
-//                input >> s.work;
-//                input >> s.efficiency;
-//                input >> s.status;
-//            }
-//        }
-//        else if ( buff[0] == 'S') {
-//            input >> s.name;
-//            input >> s.total;
-//            input >> s.work;
-//            input >> s.efficiency;
-//            input >> s.status;
-//        }
-//        else {
-//            cout << "Данные не введены в файл\n";
-//        }
-//    }
-//}
+
 
 void show_all(unordered_map<int, Pipe>& Pipemap, unordered_map<int, Station>& Stationmap) {
     for (auto& Pipe : Pipemap) {
@@ -132,49 +52,91 @@ void show_all(unordered_map<int, Pipe>& Pipemap, unordered_map<int, Station>& St
 
 int main()
 {   
-    Station s;
-    Pipe p;
-    
     setlocale(LC_ALL, "Russian");
 
-    while (1) {
+    while(1) {
         point_menu();
         switch (Check_Correct(0, 9)) {
-        case 1: 
-              cin >> p;
-              Pipemap.insert({ p.GetPipeID(),p });
-              break;
-        case 2: 
+        case 1: {
+            Pipe p;
+            cin >> p;
+            Pipemap.insert({ p.GetPipeID(),p });
+            break;
+        }
+        case 2: {
+            Station s;
             cin >> s;
             Stationmap.insert({ s.GetStationID(), s });
             break;
+        }
         case 3: 
             show_all(Pipemap, Stationmap);
             break;
         case 4:
-            edit_pipe(Pipemap);
+            
             break;
         case 5:
-            //edit_station(s);
+            
             break;
-        case 6:
-            //save(p, s);
-            break;
-        case 7:
-            //download(p, s);
-
-            break;
-        case 0:
-            int k;
-            cout << "Хотите ли сохранить изменения? Если хотитие введите 1 иначе 0 \n";
-            cin >> k;
-            if (k == 1) {
-                //save(p, s);
+        case 6: {
+            string x;
+            cout << "Введите имя файла: " << endl;
+            cin >> x;
+            ofstream file;
+            file.open(x + ".txt");
+            if (!file)
+                cout << "Файл не найден!!!" << endl;
+            else {
+                file << Pipemap.size() << " " << Stationmap.size() << endl;
+                for (auto Pipe : Pipemap) {
+                    Pipe.second.SavePipe(file);
+                }
+                for (auto Station : Stationmap) {
+                    Station.second.SaveStation(file);
+                }
             }
+            break;
+        }
+        case 7: {
+            string x;
+            int len_Pipe, len_Station;
+            Pipe p1;
+            Station s1;
+            cout << "Введите название файла: " << endl;
+            cin >> x;
+            ifstream file;
+            file.open(x + ".txt");
+            if (!file) {
+                cout << "Файл не найден!!!";
+            }
+            else {
+                Pipe::MaxID = 0;
+                Station::MaxID = 0;
+                Pipemap.clear();
+                Stationmap.clear();
+                file >> len_Pipe >> len_Station;
+                for (int i = 0; i < len_Pipe; i++) {
+                    p1.LoadPipe(file);
+                    Pipemap.insert({ p1.GetPipeID(), p1 });
+                    if (Pipe::MaxID <= p1.GetPipeID()) {
+                        Pipe::MaxID = p1.GetPipeID() + 1;
+                    }
+                }
+                for (int i = 0; i < len_Station; i++) {
+                    s1.LoadStation(file);
+                    Stationmap.insert({ s1.GetStationID(), s1 });
+                    if (Pipe::MaxID <= s1.GetStationID()) {
+                        Pipe::MaxID = s1.GetStationID() + 1;
+                    }
+                }
+            }
+            break;
+        }
+        case 0:
+            cout << "Ещё увидимся!!! \n";
             return 0;
             break;
 
-        }
-        system("pause");
+        } system("pause");
     }
 }
