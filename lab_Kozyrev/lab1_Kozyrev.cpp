@@ -10,8 +10,9 @@
 #include "utils.h";
 #include <unordered_map>;
 #include <unordered_set>;
-#include <vector>;
+#include <vector>
 #include <float.h>;
+#include "GRAPH.h";
 
 using namespace std;
 
@@ -19,6 +20,7 @@ unordered_map<int, Pipe> Pipemap;
 unordered_map<int, Station> Stationmap;
 unordered_set<int> PipeIDs;
 unordered_set<int> StationIDs;
+
 
 void point_menu() {
     system("cls");
@@ -52,7 +54,7 @@ bool CheckSWork(Station& s, double p) {
 }
 
 
-vector<int> SearchPipe(unordered_map <int, Pipe>& Pipemap) {
+  vector<int> SearchPipe(unordered_map <int, Pipe>& Pipemap) {
     vector<int> ids;
     int x;
     cout << "Отфильтровать трубу по \n 1. Имени \n 2. Статусу" << endl;
@@ -369,8 +371,83 @@ void show_all(unordered_map<int, Pipe>& Pipemap, unordered_map<int, Station>& St
 }
 
 
+void deleteGraphVertex(unordered_map<int, GRAPH>& gr, int iddelete)
+{
+    unordered_map<int, GRAPH> gp;
+    gp = gr;
+    for (auto& [k, v] : gp)
+    {
+        if ((v.idvh == iddelete) || (v.idvih == iddelete))
+            gr.erase(k);
+    }
+}
+
+void saveGRAPH(unordered_map<int, GRAPH> gr)
+{
+    ofstream f_inf;
+    f_inf.open("LR1.txt", ios::out);
+    f_inf << gr.size() << '\n';
+    for (const auto& [k, v] : gr)
+    {
+        f_inf << k << endl;
+        f_inf << v << endl;
+    }
+    f_inf.close();
+    cout << "Данные сохранены в файл" << "\n";
+
+}
+void readGraphInfile(unordered_map<int, GRAPH>& gr)
+{
+    ifstream f_inf;
+    f_inf.open("LR.txt", ios::in);
+    int kol;
+    f_inf >> kol;
+    for (int i = 0; i < kol; i++)
+    {
+        int key;
+        f_inf >> key;
+        f_inf >> gr[key];
+    }
+    f_inf.close();
+}
+
+void makeGRAPH(unordered_map <int, GRAPH>& graph, map<int, Pipe>& pipe_group, const map<int, Station>& cs_group, int& idP)
+{
+    vector <int> neighbours;
+    unordered_map <int, vector<int>> to_sort;
+    int idout;
+    cout << "Ввелите id выхода\n";
+    int kol = cs_group.size();
+    idout =     (0, kol);
+    int idin;
+    cout << "Введите id входа\n";
+    idin = Check_Correct(0, kol);
+    int diameter;
+    cout << "Введите диаметр \n";
+    cin >> diameter;
+    int idpipe;
+    idpipe = find(pipe_group, checkdiameter, diameter, graph);
+    GRAPH gr;
+    gr.idvh = idin;
+    gr.idvih = idout;
+    neighbours.push_back(gr.idvh);
+    to_sort.emplace(gr.idvih, neighbours);
+    if (idpipe != -1)
+    {
+        graph.emplace(idpipe, gr);
+    }
+    else
+    {
+        cout << "Труба не найдена. Создайте трубу\n";
+        graph.emplace(makepipe(pipe_group, idP), gr);
+        idP++;
+    }
+}
+
 int main()
 {   
+    unordered_map<int, GRAPH> graph;
+
     setlocale(LC_ALL, "Russian");
 
     while(1) {
@@ -486,6 +563,8 @@ int main()
             }
             break;
         }
+
+        
         case 0:
             cout << "Ещё увидимся!!! \n";
             return 0;

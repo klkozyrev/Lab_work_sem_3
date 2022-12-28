@@ -26,16 +26,6 @@ T Check_Correct(T min, T max)
     return x;
 }
 
-//template <typename T>
-//ostream& operator<< (ostream& out, unordered_map <int, T>& par)
-//{
-//    out << "ID: ";
-//    for (auto& [i, obj] : par) {
-//        out << i << " ";
-//    }
-//    out << endl;
-//    return out;
-//}
 
 template <typename T>
 using PipeFilter = bool(*) (Pipe& p, T par);
@@ -51,6 +41,7 @@ vector <int> SearchPipebyParameter(unordered_map <int, Pipe>& Pipemap, PipeFilte
     }
     return id;
 }
+
 template <typename T>
 vector <int> SearchSbyParameter(unordered_map <int, Station>& Stationmap, StationFilter<T> f, T par) {
     vector <int> id;
